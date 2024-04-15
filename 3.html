@@ -13,13 +13,15 @@
       <a-entity id="right-hand" hand-controls="right"></a-entity>
     </a-entity>
 
+    <!-- ボールを追加 -->
+    <a-sphere id="ball"
+              radius="0.1"
+              color="red"
+              position="0 0.5 -1"
+              dynamic-body></a-sphere>
+
     <!-- 手からボールを拾う処理を定義 -->
     <a-entity id="controller" laser-controls="hand: right" grabbable>
-      <a-entity id="ball"
-                radius="0.1"
-                color="red"
-                position="0 0.5 -1"
-                dynamic-body></a-entity>
       <!-- ボタンを押している間、ボールを手に持つ -->
       <a-animation attribute="position"
                    begin="grab-start"
