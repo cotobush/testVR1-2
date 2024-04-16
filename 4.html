@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Meta Quest 3 Piano</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene>
+    <!-- カメラとコントローラーを追加 -->
+    <a-entity camera look-controls>
+      <a-entity id="left-hand" hand-controls="left"></a-entity>
+      <a-entity id="right-hand" hand-controls="right"></a-entity>
+    </a-entity>
+
+    <!-- ピアノキーボードを追加 -->
+    <a-entity id="piano" position="0 0 -3">
+      <!-- 白鍵 -->
+      <a-entity class="key white" data-note="C" position="-1 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <a-entity class="key white" data-note="D" position="-0.7 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <!-- 中央の黒鍵 -->
+      <a-entity class="key black" data-note="C#" position="-0.85 0 0.3" geometry="primitive: box; width: 0.07; height: 0.015; depth: 0.25" material="color: black"></a-entity>
+      <!-- 黒鍵 -->
+      <a-entity class="key black" data-note="D#" position="-0.55 0 0" geometry="primitive: box; width: 0.1; height: 0.015; depth: 0.4" material="color: black"></a-entity>
+      <a-entity class="key black" data-note="F" position="-0.35 0 0" geometry="primitive: box; width: 0.1; height: 0.015; depth: 0.4" material="color: black"></a-entity>
+      <a-entity class="key white" data-note="E" position="-0.2 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <a-entity class="key white" data-note="F" position="0 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <a-entity class="key black" data-note="F#" position="0.15 0 0" geometry="primitive: box; width: 0.1; height: 0.015; depth: 0.4" material="color: black"></a-entity>
+      <a-entity class="key white" data-note="G" position="0.3 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <a-entity class="key black" data-note="G#" position="0.45 0 0" geometry="primitive: box; width: 0.1; height: 0.015; depth: 0.4" material="color: black"></a-entity>
+      <a-entity class="key white" data-note="A" position="0.6 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+      <!-- 最後の白鍵 -->
+      <a-entity class="key white" data-note="B" position="0.8 0 0" geometry="primitive: box; width: 0.1; height: 0.01; depth: 0.4" material="color: white"></a-entity>
+    </a-entity>
+
+    <!-- 手を検出してピアノを演奏するスクリプト -->
+    <script>
+      AFRAME.registerComponent('piano-controller', {
+        init: function () {
+          this.pianoKeys = document.querySelectorAll('.key');
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.oscillators = {};
+          this.hand = document.querySelector('#right-hand');
+          this.hand.addEventListener('triggerdown', this.playNote.bind(this));
+          this.hand.addEventListener('triggerup', this.stopNote.bind(this));
+        },
+        playNote: function () {
+          this.pianoKeys.forEach(key => {
+            let distance = this.hand.object3D.position.distanceTo(key.object3D.position);
+            if (distance < 0.1) {
+              let note = key.getAttribute('data-note');
+              if (!this.oscillators[note]) {
+                let frequency = this.getFrequencyByKey(note);
+                let oscillator = this.audioContext.createOscillator();
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.connect(this.audioContext.destination);
+                oscillator.start();
+                this.oscillators[note] = oscillator;
+              }
+              key.setAttribute('material', 'color: yellow');
+            }
+          });
+        },
+        stopNote: function () {
+          this.pianoKeys.forEach(key => {
+            let note = key.getAttribute('data-note');
+            if (this.oscillators[note]) {
+              this.oscillators[note].stop();
+              delete this.oscillators[note];
+            }
+            key.setAttribute('material', 'color', key.classList.contains('white') ? 'white' : 'black');
+          });
+        },
+        getFrequencyByKey: function (note) {
+          const keyFrequencies = {
+            'C': 261.63,
+            'C#': 277.18,
+            'D': 293.66,
+            'D#': 311.13,
+            'E': 329.63,
+            'F': 349.23,
+            'F#': 369.99,
+            'G': 392.00,
+            'G#': 415.30,
+            'A': 440.00,
+            'A#': 466.16,
+            'B': 493.88
+          };
+          return keyFrequencies[note];
+        }
+      });
+    </script>
+    <a-entity piano-controller></a-entity>
+  </a-scene>
+</body>
+</html>
