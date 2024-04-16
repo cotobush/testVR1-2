@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stacking Blocks in VR</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/stemkoski/A-Frame-Hand-Tracking-Component/master/dist/aframe-hand-tracking-component.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+</head>
+<body>
+  <a-scene 
+    arjs="sourceType: webcam; debugUIEnabled: false;"
+    physics="gravity: -9.8; debug: false"
+    hand-tracking="hand: left; model: lowpoly; color: #FF0000; filter: true"
+  >
+    <!-- パススルーのビデオ -->
+    <a-entity camera passthrough-controls></a-entity>
+
+    <!-- 手 -->
+    <a-entity hand-tracking-controls="hand: left"></a-entity>
+
+    <!-- 床 -->
+    <a-plane position="0 0 -4" rotation="-90 0 0" width="20" height="20" color="#888" static-body></a-plane>
+
+    <!-- 積み木 -->
+    <a-box position="-1 0.5 -5" width="1" height="1" depth="1" color="#FF0000" grabbable dynamic-body></a-box>
+    <a-box position="0 1.5 -5" width="1" height="1" depth="1" color="#00FF00" grabbable dynamic-body></a-box>
+    <a-box position="1 2.5 -5" width="1" height="1" depth="1" color="#0000FF" grabbable dynamic-body></a-box>
+    <a-box position="-1.5 3.5 -5" width="1" height="1" depth="1" color="#FFA500" grabbable dynamic-body></a-box>
+    <a-box position="0.5 4.5 -5" width="1" height="1" depth="1" color="#FFFF00" grabbable dynamic-body></a-box>
+  </a-scene>
+</body>
+</html>
